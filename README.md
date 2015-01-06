@@ -80,7 +80,7 @@ For now. You can use key listed below.
 Probably almost people think "Too less to use!".  
 Yes. I think that too.
 
-#### How to use another plugins in own plan.
+#### How to use another plugins.
 
 You have 2 ways to add pipes.
 
@@ -98,7 +98,7 @@ Check out the [Configure](#Configure) term.
 var gulp     = require('gulp');
 var carryOut = require('gulp-carryout')( gulp, plan );
 
-gulp.task('run-carry-out',function(){
+gulp.task('run-carryout',function(){
   carryOut.run('category');
 });
 ```
@@ -108,13 +108,13 @@ gulp.task('run-carry-out',function(){
 ### 3. Run
 
 ```sh
-gulp run-carry-out
+gulp run-carryout
 ```
 
 That command same as
 
 ```sh
-gulp run-carry-out -t default
+gulp run-carryout -t default
 ```
 
 ---
@@ -125,7 +125,7 @@ If you want to watch the task.
 Use -w option. That is all.
 
 ```sh
-gulp run-carry-out -w
+gulp run-carryout -w
 ```
 
 ### And more
@@ -144,7 +144,7 @@ gulp run-carry-out -w
 You can use pipe() after run
 
 ```javascript
-gulp.task('run-carry-out',function(){
+gulp.task('run-carryout',function(){
   carryOut.run('category')
     .pipe( gulp.dest('out') );
 });
@@ -155,7 +155,7 @@ gulp.task('run-carry-out',function(){
 You can also using between flow using pipe method.
 
 ```javascript
-gulp.task('run-carry-out',function(){
+gulp.task('run-carryout',function(){
   gulp.src('/path/to/*.js')
     .pipe( carryOut.pipe('category','target') )
     .pipe( gulp.dest('out') );
