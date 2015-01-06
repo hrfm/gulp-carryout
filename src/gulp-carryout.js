@@ -293,19 +293,28 @@
     // ------------------------------------------------------------------------------
 
     return {
-      
+
       // @see _run
-      'run' : function( category, target, order ){
+      'run' : function( category, target ){
         
         if( typeof category === 'undefined' ){
           throw '"category" is required.';
         }
         
-        return _run( category, target, order );
-
+        if( target === "*" ){
+          runAll = true;
+        }
+        
+        return _run( category, target );
+        
       },
 
-      'pipe' : function( category, target, order ){
+      'watch' : function( category, target ){
+        watchMode = true;
+        return run( category, target );
+      },
+
+      'pipe' : function( category, target ){
 
         if( typeof category === 'undefined' || typeof target === 'undefined' ){
           throw '"category" and "target" are required.';
