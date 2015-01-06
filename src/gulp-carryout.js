@@ -304,11 +304,14 @@
         if( typeof category === 'undefined' || typeof target === 'undefined' ){
           throw '"category" and "target" are required.';
         }
-
+        
+        // --- Not capable 'runAll' and 'watchMode' with pipe mode.
+        
         runAll    = false;
         watchMode = false;
-        runTask   = undefined;
-
+        
+        // --- start pipe mode.
+        
         return _pipe( category, target, order );
 
       }
