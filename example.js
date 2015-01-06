@@ -5,12 +5,23 @@ var carryout = require('./index.js')({
 	'js':{
 		'default':{
 			'src':'test/js/*.js',
-			'uglify':true,
 			'concat':'ab.js',
 			'dest':'test/dest/js'
+		},
+		'minify':{
+			'uglify':true,
+			'concat':'ab.min.js'
 		}
 	}
 });
 //*/
 
-carryout.run('js');
+var g = require('gulp');
+
+/*
+carryout.run('js','test');
+/*/
+g.src('test/js/*.js')
+ .pipe( carryout.pipe('js','minify') )
+ .pipe( g.dest('test/dest/js') );
+//*/

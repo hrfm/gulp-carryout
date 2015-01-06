@@ -10,9 +10,9 @@
 	module.exports = {
 
 		'common_pipes' : {
-			'concat' : function( gulp, stream, config ){
-				if( typeof config.concat !== 'undefined' ){
-					return stream.pipe( concat(config.concat) );
+			'concat' : function( gulp, stream, plan ){
+				if( typeof plan.concat !== 'undefined' ){
+					return stream.pipe( concat(plan.concat) );
 				}
 				return stream;
 			}
@@ -21,11 +21,11 @@
 		'css' : {
 			'order' : ['sass','concat'],
 			'pipes' : {
-				'sass' : function( gulp, stream, config ){
-					if( config.sass === false ){
+				'sass' : function( gulp, stream, plan ){
+					if( plan.sass === false ){
 						return stream;
 					}
-					var src = ( config.src instanceof Array ) ? config.src.join(",") : config.src;
+					var src = ( plan.src instanceof Array ) ? plan.src.join(",") : plan.src;
 					if( src.match(/\.sass|\.scss/) ){
 						return stream.pipe( sass() );
 					}else{
@@ -38,8 +38,8 @@
 		'js' : {
 			'order' : ['concat','uglify'],
 			'pipes' : {
-				'uglify' : function( gulp, stream, config ){
-					if( config.uglify === true ){
+				'uglify' : function( gulp, stream, plan ){
+					if( plan.uglify === true ){
 						return stream.pipe( uglify() );
 					}
 					return stream;

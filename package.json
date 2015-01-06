@@ -1,6 +1,6 @@
 {
   "name": "gulp-carryout",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "Carry out gulp tasks easily.",
   "main": "index.js",
   "scripts": {
@@ -34,6 +34,8 @@
     "gulp-plumber": "^0.6.6",
     "minimist": "^1.1.0",
     "merge-stream": "^0.1.6",
-    "gulp-sass": "^1.2.4"
+    "gulp-sass": "^1.2.4",
+    "through2": "^0.6.3",
+    "gulp-util": "^3.0.1"
   }
 }
