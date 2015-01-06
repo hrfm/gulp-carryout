@@ -103,25 +103,26 @@
       
       var sm, streams = [];
 
-      // --- Case1 : If using -p options. Run those tasks. --------------------
+      // --- Case1 : Running task if target specified from arguments. --------
 
-      if( typeof runTask !== 'undefined' ){
+      if( typeof !target === 'undefined' ){
 
-        // If specified runTask has multipre parts.
-        // Run all tasks that specified from command line and return marged stream.
+        // If target has multiple tasks. Running them all.
 
-        // Otherwise, simply run task and return that stream.
-
-        if( runTask instanceof Array ){
-          for( var i=0; i<runTask.length; i++ ){
-            sm = _helper( category, runTask[i], order, src );
+        if( target instanceof Array ){
+          
+          for( var i=0; i<target.length; i++ ){
+            sm = _helper( category, target[i], order, src );
             if( typeof sm !== 'undefined' ){
               streams.push( sm );
             }
           }
-          return merge.apply( this, streams );
+          return merge.apply(this,streams);
+
         }else{
-          return _helper( category, runTask, order, src );
+
+          return _helper( category, target, order, src );
+
         }
 
       }
@@ -142,22 +143,37 @@
 
       }
 
-      // --- Neither : Running task that specified from arguments. ----------------
+      // --- Case3 : If using -p options. Run those tasks. --------------------
 
-      // If target has multiple tasks. Running them all.
+      if( typeof runTask !== 'undefined' ){
 
-      if( target instanceof Array ){
-        for( var i=0; i<target.length; i++ ){
-          sm = _helper( category, target[i], order, src );
-          if( typeof sm !== 'undefined' ){
-            streams.push( sm );
+        // If specified runTask has multipre parts.
+        // Run all tasks that specified from command line and return marged stream.
+
+        // Otherwise, simply run task and return that stream.
+
+        if( runTask instanceof Array ){
+
+          for( var i=0; i<runTask.length; i++ ){
+            sm = _helper( category, runTask[i], order, src );
+            if( typeof sm !== 'undefined' ){
+              streams.push( sm );
+            }
           }
+          return merge.apply( this, streams );
+
+        }else{
+
+          return _helper( category, runTask, order, src );
+
         }
-        return merge.apply(this,streams);
-      }else{
-        return _helper( category, target || 'default', order, src );
+
       }
 
+      // --- Neither : Run default task. -----------------
+
+      return _helper( category, 'default', order, src );
+      
     }
 
     /**
@@ -304,14 +320,14 @@
         if( typeof category === 'undefined' || typeof target === 'undefined' ){
           throw '"category" and "target" are required.';
         }
-        
+
         // --- Not capable 'runAll' and 'watchMode' with pipe mode.
-        
+
         runAll    = false;
         watchMode = false;
-        
+
         // --- start pipe mode.
-        
+
         return _pipe( category, target, order );
 
       }
