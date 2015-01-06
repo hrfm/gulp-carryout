@@ -1,25 +1,27 @@
-/*
-var carryout = require('./index.js')( require('./test/plan.js') );
-/*/
-var carryout = require('./index.js')({
+var g        = require('gulp');
+var carryout = require('./index.js')( g, {
 	'js':{
 		'default':{
-			'src':'test/js/*.js',
-			'concat':'ab.js',
-			'dest':'test/dest/js'
+			'src'  : 'test/js/*.js',
+			'pipe' : [
+				[ 'concat' , 'ab.js'        ],
+				[ 'dest'   , 'test/dest/js' ]
+			]
 		},
 		'minify':{
-			'uglify':true,
-			'concat':'ab.min.js'
+			'src'  : 'test/js/*.js',
+			'pipe' : [
+				[ 'uglify' , true           ],
+				[ 'concat' , 'ab.min.js'    ],
+				[ 'dest'   , 'test/dest/js' ]
+			]
 		}
 	}
 });
 //*/
 
-var g = require('gulp');
-
-/*
-carryout.run('js','test');
+//*
+carryout.run('js');
 /*/
 g.src('test/js/*.js')
  .pipe( carryout.pipe('js','minify') )

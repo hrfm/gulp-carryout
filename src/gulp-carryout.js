@@ -34,7 +34,7 @@
       through  = require('through2')
   ;
 
-  module.exports = function( plan, pipes, gulpRef ){
+  module.exports = function( gulpRef, plan, pipes ){
 
     // ==============================================================================
     // --- Initialize arguments.
@@ -96,23 +96,22 @@
      * 
      * @param category  
      * @param target  
-     * @param order 
      * @return single or marged stream
      */
-    function _run( category, target, order, src ){
+    function _run( category, target, src ){
       
       var sm, streams = [];
 
       // --- Case1 : Running task if target specified from arguments. --------
 
-      if( typeof !target === 'undefined' ){
+      if( typeof target !== 'undefined' ){
 
         // If target has multiple tasks. Running them all.
 
         if( target instanceof Array ){
           
           for( var i=0; i<target.length; i++ ){
-            sm = _helper( category, target[i], order, src );
+            sm = _helper( category, target[i], src );
             if( typeof sm !== 'undefined' ){
               streams.push( sm );
             }
@@ -121,7 +120,7 @@
 
         }else{
 
-          return _helper( category, target, order, src );
+          return _helper( category, target, src );
 
         }
 
@@ -134,7 +133,7 @@
         // Run all tasks on _plan[category].
 
         for( var key in _plan[category] ){
-          sm = _helper( category, key, order, src );
+          sm = _helper( category, key, src );
           if( typeof sm !== 'undefined' ){
             streams.push( sm );
           }
@@ -155,7 +154,7 @@
         if( runTask instanceof Array ){
 
           for( var i=0; i<runTask.length; i++ ){
-            sm = _helper( category, runTask[i], order, src );
+            sm = _helper( category, runTask[i], src );
             if( typeof sm !== 'undefined' ){
               streams.push( sm );
             }
@@ -164,7 +163,7 @@
 
         }else{
 
-          return _helper( category, runTask, order, src );
+          return _helper( category, runTask, src );
 
         }
 
@@ -172,8 +171,8 @@
 
       // --- Neither : Run default task. -----------------
 
-      return _helper( category, 'default', order, src );
-      
+      return _helper( category, 'default', src );
+
     }
 
     /**
@@ -182,56 +181,47 @@
      * 
      * @param category  
      * @param target  
-     * @param order 
      * @return stream
      */
-    function _helper( category, target, order, src ){
+    function _helper( category, target, source ){
       
-      target = target || 'default';   
-      
-      if( !_plan[category] || !_plan[category][target] ){
+      if( !_plan[category] ){
+        gulp.emit('error', new Error('gulp-carryout : Category "' + category + '" is not found.' ) );
+        return;
+      }
+
+      // --- serup target
+
+      target = target || 'default';
+
+      if( target === 'default' && typeof _plan[category][target] === 'string' ){
+        target = _plan[category][target];
+      }
+
+      if( !_plan[category][target] ){
         gulp.emit('error', new Error('gulp-carryout : Task "' + target + '" is not found.' ) );
         return;
       }
 
+      // --- setup plan
+
       var plan = _plan[category][target];
+      var src  = source || plan.src;
+      var pipe = plan.pipe;
 
       var fn = function(){
 
         console.log("Starting '"+category+":"+target+"'");
 
-        var time = new Date().getTime(), stream, order;
+        var time   = new Date().getTime(), stream, order;
+        var stream = gulp.src( src );
 
-        // --- Setup stream.
-
-        stream = gulp.src( src || plan.src );
-
-        if( plan.plumber !== false ){
-          stream = stream.pipe( plumber() );
+        for( var i=0, len=pipe.length; i<len; i++ ){
+          var key = pipe[i][0], val = pipe[i][1],
+              f   = _pipes[category][key] || _pipes['common_pipes'][key];
+          if( f ) stream = f( gulp, stream, val );
         }
 
-        // --- connect pipes from order.
-
-        order = order || plan['@order'] || _pipes[category]['order'];
-
-        for( var i=0, len=order.length; i<len; i++ ){
-          if( typeof plan[order[i]] !== 'undefined' ){
-            var f = _pipes[category]['pipes'][order[i]] || _pipes['common_pipes'][order[i]];
-            if( f ){
-              stream = f( gulp, stream, plan );
-            }
-          }
-        }
-
-        // --- dest files if needed.
-
-        if( typeof plan.dest !== 'undefined' ){
-          stream = stream.pipe( gulp.dest(plan.dest) );
-        }
-
-        //stream.on( 'end', function(){ console.log('end'); });
-        //stream.on( 'unpipe', function(){ console.log('unpipe'); });
-        
         // --- Listen 'end' event and logging when event triggered.
 
         stream.on( 'end', function(){
@@ -245,7 +235,7 @@
 
       if( watchMode === true ){
         console.log("Watching '"+category+":"+target+"'");
-        gulp.watch( plan.src, fn );
+        gulp.watch( src, fn );
       }else{
         return fn();
       }
@@ -275,7 +265,7 @@
 
           var that = this, files = [];
 
-          _run( category, target, callback, src )
+          _run( category, target, src )
             .pipe( through.obj(
               function(file, encoding, callback){
                 if(file.isNull()  ){ return callback(); }
@@ -330,6 +320,17 @@
 
         return _pipe( category, target, order );
 
+      },
+
+      'setBehavior' : function(){
+        var a = arguments, argl = a.length;
+        if( typeof a[0] === 'string' ){
+          if( typeof a[1] === 'function' ){
+            _pipes['common'][a[0]] = a[1];
+          }else if( typeof a[1] === 'string' && typeof a[1] === 'function' ){
+            _pipes[a[0]][a[1]] = a[2];
+          }
+        }
       }
 
     }

@@ -2,50 +2,52 @@
 
     "use strict;"
 
-	var concat = require('gulp-concat'),
-		sass   = require('gulp-sass'),
-		uglify = require('gulp-uglify')
+	var concat  = require('gulp-concat'),
+		plumber = require('gulp-plumber'),
+		sass    = require('gulp-sass'),
+		uglify  = require('gulp-uglify')
 		;
 
 	module.exports = {
 
 		'common_pipes' : {
-			'concat' : function( gulp, stream, plan ){
-				if( typeof plan.concat !== 'undefined' ){
-					return stream.pipe( concat(plan.concat) );
+			
+			'dest'    : function( gulp, stream, value ){
+				if( typeof value !== 'undefined' ){
+					return stream.pipe( gulp.dest( value ) );
+				}
+				return stream;
+			},
+
+			'concat'  : function( gulp, stream, value ){
+				if( typeof value !== 'undefined' ){
+					return stream.pipe( concat(value) );
+				}
+				return stream;
+			},
+			'plumber' : function( gulp, stream, value ){
+				if( value === true ){
+					return stream.pipe( plumber() );
+				}
+				return stream;
+			},
+			'sass'    : function( gulp, stream, value ){
+				if( typeof value !== 'undefined' ){
+					return stream.pipe( sass() );
+				}
+				return stream;
+			},
+			'uglify'  : function( gulp, stream, value ){
+				if( value === true ){
+					return stream.pipe( uglify() );
 				}
 				return stream;
 			}
+			
 		},
 
-		'css' : {
-			'order' : ['sass','concat'],
-			'pipes' : {
-				'sass' : function( gulp, stream, plan ){
-					if( plan.sass === false ){
-						return stream;
-					}
-					var src = ( plan.src instanceof Array ) ? plan.src.join(",") : plan.src;
-					if( src.match(/\.sass|\.scss/) ){
-						return stream.pipe( sass() );
-					}else{
-						return stream;
-					}
-				}
-			}
-		},
-
-		'js' : {
-			'order' : ['concat','uglify'],
-			'pipes' : {
-				'uglify' : function( gulp, stream, plan ){
-					if( plan.uglify === true ){
-						return stream.pipe( uglify() );
-					}
-					return stream;
-				}
-			}
-		}
+		'css' : {},
+		'js'  : {}
 
 	}
 
