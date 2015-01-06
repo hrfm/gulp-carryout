@@ -1,7 +1,6 @@
 # gulp-carryout
 
 ## Background
----
 
 I don't want to write similar gulp task anymore.  
 I want to run task likes below.  
@@ -23,18 +22,15 @@ gulp minify -t product -w
 
 Those commands looks like simple. (Atleast for me.)
 
-
 ## Getting started
----
 
 You can install this module from npm.
 
     npm install gulp-carryout
 
 ## Usage
----
 
-### 0. Create task plan.
+### 1. Create task plan.
 
 Task plan format should be like below.
 
@@ -42,8 +38,11 @@ Task plan format should be like below.
 var plan = {
   'category' : {
     'target' : {
-      'key' : 'value'
-      // ... tasks
+      'src'  : 'path/to/src',
+      'pipe' : [
+        [ 'key', value ]
+        // ... tasks
+      ]
     }
   }
 }
@@ -56,10 +55,13 @@ var plan = {
   'js' : {
     'default' : 'minify',
     'minify' : {
-      'src'    : ['/path/to/*.js','!**/*.map'],
-      'concat' : 'jsfiles.min.js',
-      'uglify' : true,
-      'dest'   : '/path/to/dest'
+      'src'  : ['/path/to/*.js','!**/*.map'],
+      'pipe' : [
+        [ 'plumber', true             ],
+        [ 'concat' , 'jsfiles.min.js' ],
+        [ 'uglify' , true             ],
+        [ 'dest'   , '/path/to/dest'  ]
+      ]
     }
   }
 }
@@ -69,10 +71,10 @@ For now. You can use key listed below.
 
 |key    |behavior |
 |-------|---------|
-|src    |gulp.src(src)            |
+|concat |pipe(concat(concat))     |
 |dest   |pipe(gulp.dest(dest))    |
 |plumber|if(true) pipe(plumber()) |
-|concat |pipe(concat(concat))     |
+|sass   |if(true) pipe(uglify())  |
 |uglify |if(true) pipe(uglify())  |
 
 Probably almost people think "Too less to use!".  
@@ -88,7 +90,9 @@ You have 2 ways to add pipes.
 This topic will be long story.
 Check out the [Configure](#Configure) term.
 
-### 1. Setup gulp-carryout
+---
+
+### 2. Setup gulp-carryout
 
 ```javascript
 var gulp     = require('gulp');
@@ -98,6 +102,8 @@ gulp.task('run-carry-out',function(){
   carryOut.run('category');
 });
 ```
+
+---
 
 ### 3. Run
 
@@ -111,6 +117,8 @@ That command same as
 gulp run-carry-out -t default
 ```
 
+---
+
 ### 4. Watch
 
 If you want to watch the task.  
@@ -120,13 +128,18 @@ Use -w option. That is all.
 gulp run-carry-out -w
 ```
 
-## Configure
----
+### And more
+
+他にも色々あるけど後で書く・・・
+
+## <a name ="Configure">Configure
+
 
 後で書く・・・
 
 ## etc.
----
+
+### Chain pipe after run
 
 You can use pipe() after run
 
@@ -137,6 +150,8 @@ gulp.task('run-carry-out',function(){
 });
 ```
 
+### Using gulp-carryout berween pipes
+
 You can also using between flow using pipe method.
 
 ```javascript
@@ -146,6 +161,10 @@ gulp.task('run-carry-out',function(){
     .pipe( gulp.dest('out') );
 });
 ```
+
+carryOut.pipe() will use recent pipe results. Ignore plan's src.
+
+
 
 LICENSE
 -------
