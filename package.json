@@ -1,6 +1,6 @@
 {
   "name": "gulp-carryout",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Carry out gulp tasks.",
   "main": "./index.js",
   "scripts": {
